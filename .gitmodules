@@ -1,0 +1,6 @@
+[submodule "CL"]
+	path = CL
+	url = https://github.com/vitimon/CL
+[submodule "iECI"]
+	path = iECI
+	url = https://github.com/vitimon/iECI
