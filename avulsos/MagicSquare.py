@@ -4,6 +4,7 @@ def isSquareMatrix(candidate):
         if len(i) != lines:
             return False
     return candidate, lines
+
 def isMagicMatrix(candidate):
     candidate = isSquareMatrix(candidate)
     if candidate:
