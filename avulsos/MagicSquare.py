@@ -29,5 +29,7 @@ def isMagicMatrix(candidate):
             return False
         else:
             return True
+    else:
+        return False
 
 
