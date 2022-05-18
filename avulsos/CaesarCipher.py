@@ -13,8 +13,8 @@ def shiftChar(char,salt=0):
     return " " if shiftedValue == 123 else chr(shiftedValue)
 
 def codeCaesar(text,salt):
-    map(shiftChar,text,[salt]*len(salt))
-    
+    return ''.join(map(shiftChar,text,[salt]*len(text)))
+
 def decodeCaesar(text,salt):
     return codeCaesar(text,1 + highestValue - lowestValue - salt)
 
