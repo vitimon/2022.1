@@ -5,7 +5,7 @@ highestValue = 123
 charTrail = (' '*lowestValue) + ascii_lowercase + ' '
 
 def filterChar(char):
-    return char if (char in charTrail) | (char == ' ') else " "
+    return char if (char in charTrail) else " "
     
 def shiftChar(char,salt=0):
     char = filterChar(char)
