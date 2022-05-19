@@ -1,16 +1,17 @@
-import string
-
+from string import ascii_lowercase
 lowestValue = 97
 highestValue = 123
 
+charTrail = (' '*lowestValue) + ascii_lowercase + ' '
+
 def filterChar(char):
-    return char if (char in string.ascii_lowercase) | (char == ' ') else " "
+    return char if (char in charTrail) | (char == ' ') else " "
     
 def shiftChar(char,salt=0):
     char = filterChar(char)
     charValue = (123 if char == ' ' else ord(char))
     shiftedValue = lowestValue + (charValue - lowestValue + salt) % (1 + highestValue - lowestValue)
-    return " " if shiftedValue == 123 else chr(shiftedValue)
+    return charTrail[shiftedValue]
 
 def codeCaesar(text,salt):
     return ''.join(map(shiftChar,text,[salt]*len(text)))
