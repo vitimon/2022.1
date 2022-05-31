@@ -1,4 +1,3 @@
-
 spaceOrd = ord(' ')
 lowestDigit = ord('0')
 highestDigit = ord('9')
@@ -6,7 +5,6 @@ lowestUppercase = ord('A')
 highestUppercase = ord('Z')
 lowestLowercase = ord('a')
 highestLowercase = ord('z')
-
 
 def makeTrail():
     charTrail = [32]
@@ -36,22 +34,3 @@ def codeCaesar(text,salt):
 
 def decodeCaesar(text,salt):
     return codeCaesar(text, trailLenght - (salt % trailLenght))
-
-
-
-"""
-def makeShiftMap(salt):
-    targetTrail = 
-
-def filterChar(char):
-    return char if char in charTrail else ' '
-
-def shiftChar(char,salt=0):
-    charValue = filterChar(char)
-    shiftedValue = ####
-    return #######
-
-
-def LuidisFunction(inputTuple):
-    return codeCaesar(inputTuple[1],inputTuple[2]) if inputTuple[0] else decodeCaesar(inputTuple[1],inputTuple[2])
-"""
