@@ -7,14 +7,7 @@ lowestLowercase = ord('a')
 highestLowercase = ord('z')
 
 def makeTrail():
-    charTrail = [32]
-    for i in range(lowestDigit,highestDigit + 1):
-        charTrail += [i]
-    for i in range(lowestUppercase,highestUppercase + 1):
-        charTrail += [i]
-    for i in range(lowestLowercase,highestLowercase + 1):
-        charTrail += [i]
-    return charTrail
+    return list(range(spaceOrd,spaceOrd +1)) + list(range(lowestDigit, highestDigit + 1)) + list(range(lowestLowercase, highestLowercase + 1)) + list(range(lowestUppercase, highestUppercase + 1))
 
 trailLenght = len(makeTrail())
 
