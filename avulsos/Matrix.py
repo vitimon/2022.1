@@ -1,3 +1,6 @@
+from time import sleep
+from random import randint
+
 class Matrix:
     matrix = []
     lines = 0
@@ -46,10 +49,72 @@ class Matrix:
             result += [[]]
             for column in range(other.columns):
                 element = 0
-                for sum in range(self.columns):
-                    element += self.matrix[line][sum]*other.matrix[sum][column]
+                for stack in range(self.columns):
+                    element += self.matrix[line][stack]*other.matrix[stack][column]
                 result[line] += [element]
         return Matrix(self.lines,other.columns, result)
 
     def __repr__(self):
-        return str(self.matrix())
+        stringfyed = ""
+        for line in self.matrix:
+            stringfyed += str(line) + "\n"
+        return stringfyed
+    
+    def filterCell(self,x,y,pattern = [0]):
+        size = len(pattern)
+        if y < -1:
+            raise("Y OUT OF LESSER BOUNDARIES")
+        if y > self.lines:
+            raise("Y OUT OF UPPER BOUNDARIES")
+        if x < -1:
+            raise("X OUT OF LEFTMOST BOUNDARIES")
+        if x > self.columns:
+            raise("X OUT OF RIGHTMOST BOUNDARIES")
+        if y == -1:
+            return pattern[(x+1)%size]
+        if x == self.columns:
+            return pattern[(self.columns + y + 2 )%size]
+        if y == self.lines:
+            return pattern[(2*self.columns + self.lines -x + 2)%size ]
+        if x == -1:
+            return pattern[(2*self.columns + 2*self.lines - y + 3)%size]
+        return 1 if self.matrix[y][x] else 0
+
+    def cellquence(self,x,y,externalPattern =[0]):
+        currentState = self.matrix[y][x]
+        nextState = 0
+        for delta1 in range(-1,2):
+            for delta2 in range(-1,2):
+                nextState += self.filterCell(x+delta1,y+delta2, externalPattern)
+        return 1 if nextState == 3 | (nextState - currentState) == 3 else 0
+
+
+
+    def nextState(self,borderPattern =[0]):
+        nextMatrix = []
+        for line in range(self.lines):
+            nextMatrix+= [[]]
+            for column in range(self.columns):
+                nextMatrix[line] += [ self.cellquence(column,line,borderPattern) ]
+        return Matrix(self.lines,self.columns,nextMatrix)
+    
+    def simulateCGoL(self,steps = 1,timer = 1,pattern = [0]):
+        print(self)
+        simulated = self.nextState(pattern)
+        while(steps > 0):
+            print(steps)
+            print(simulated)
+            simulated = simulated.nextState(pattern)
+            steps -= 1
+            sleep(timer)
+
+def makeRandomBinaryMatrix(lines,columns):
+    binaryMatrix = []
+    for line in range(lines):
+        binaryMatrix += [[]]
+        for column in range(columns):
+            binaryMatrix[line] += [randint(0,1)]
+    return Matrix(lines,columns,binaryMatrix)
+
+
+

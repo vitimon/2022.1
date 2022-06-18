@@ -1,11 +1,10 @@
-def recursiveBubbleSort(unorderedList, orderedList = []):
+def recursiveBubbleSort(unorderedList):
     pivot = unorderedList[0]
-    #DESANINHAR IFS
-    if len(unorderedList) > 1:
-        for i in unorderedList[1:]:
-            if i < pivot:
-                pivot = i 
+    if len(unorderedList) <= 1: return unorderedList
+    pivot = unorderedList[0]
+    for i in unorderedList[1:]: 
+        if i < pivot: pivot = i 
     unorderedList.remove(pivot)
-    return recursiveBubbleSort(unorderedList, orderedList + [pivot]) if unorderedList else orderedList + [pivot]
+    return [pivot] + recursiveBubbleSort(unorderedList)
 
     
