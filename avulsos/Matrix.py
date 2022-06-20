@@ -1,5 +1,9 @@
+from pickle import EMPTY_DICT
 from time import sleep
 from random import randint
+from os import system
+
+clear = lambda: system('clear')
 
 class Matrix:
     matrix = []
@@ -13,6 +17,9 @@ class Matrix:
             self.matrix += [[]]
             for column in range(self.columns):
                 self.matrix[line] += [v[line][column]]
+
+    def __init__(self,lines,columns,**initializers):
+        self = Matrix(lines,columns,[[0]*columns]*lines)
 
     def __add__(self,other):
         if type(self) != type(other):
@@ -54,13 +61,37 @@ class Matrix:
                 result[line] += [element]
         return Matrix(self.lines,other.columns, result)
 
+    def __or__(self,other):
+        if type(self) != type(other):
+            raise("Only matrixes can be 'ored'.")
+        if (self.lines != other.lines) | (self.columns != other.columns):
+            raise("Matrixes must have the same number of lines and columns.")
+        result = []
+        for line in range(self.lines):
+            result += [[]]
+            for column in range(self.columns):
+                result[line] += [self.matrix[line][column] | other.matrix[line][column]]
+        return Matrix(self.lines,self.columns, result)
+    
+    def __xor__(self,other):
+        if type(self) != type(other):
+            raise("Only matrixes can be 'xored'.")
+        if (self.lines != other.lines) | (self.columns != other.columns):
+            raise("Matrixes must have the same number of lines and columns.")
+        result = []
+        for line in range(self.lines):
+            result += [[]]
+            for column in range(self.columns):
+                result[line] += [self.matrix[line][column] ^ other.matrix[line][column]]
+        return Matrix(self.lines,self.columns, result)
+
     def __repr__(self):
         stringfyed = ""
         for line in self.matrix:
             stringfyed += str(line) + "\n"
         return stringfyed
     
-    def filterCell(self,x,y,pattern = [0]):
+    def __filterCell(self,x,y,pattern = [0]):
         size = len(pattern)
         if y < -1:
             raise("Y OUT OF LESSER BOUNDARIES")
@@ -80,12 +111,12 @@ class Matrix:
             return pattern[(2*self.columns + 2*self.lines - y + 3)%size]
         return 1 if self.matrix[y][x] else 0
 
-    def cellquence(self,x,y,externalPattern =[0]):
+    def __cellquence(self,x,y,externalPattern =[0]):
         currentState = self.matrix[y][x]
         nextState = 0
         for delta1 in range(-1,2):
             for delta2 in range(-1,2):
-                nextState += self.filterCell(x+delta1,y+delta2, externalPattern)
+                nextState += self.__filterCell(x+delta1,y+delta2, externalPattern)
         return 1 if nextState == 3 | (nextState - currentState) == 3 else 0
 
 
@@ -95,7 +126,7 @@ class Matrix:
         for line in range(self.lines):
             nextMatrix+= [[]]
             for column in range(self.columns):
-                nextMatrix[line] += [ self.cellquence(column,line,borderPattern) ]
+                nextMatrix[line] += [ self.__cellquence(column,line,borderPattern) ]
         return Matrix(self.lines,self.columns,nextMatrix)
     
     def simulateCGoL(self,steps = 1,timer = 1,pattern = [0]):
@@ -107,6 +138,14 @@ class Matrix:
             simulated = simulated.nextState(pattern)
             steps -= 1
             sleep(timer)
+            clear()
+
+def makeEmptyMatrix(lines,columns):
+    return Matrix(lines,columns,[[0]*columns]*lines)
+
+def makeFullMatrix(lines,columns):
+    return Matrix(lines,columns,[[1]*columns]*lines)
+
 
 def makeRandomBinaryMatrix(lines,columns):
     binaryMatrix = []
@@ -116,5 +155,12 @@ def makeRandomBinaryMatrix(lines,columns):
             binaryMatrix[line] += [randint(0,1)]
     return Matrix(lines,columns,binaryMatrix)
 
+def makeRandomPattern(lines,columns):
+    randomPattern = []
+    for element in range(2*lines + 2*columns + 4):
+        randomPattern += [randint(0,1)]
+    return randomPattern
 
-
+def simulateRandom(size):
+    initialState = makeRandomBinaryMatrix(size,size)
+    initialState.simulateCGoL(100,1)
