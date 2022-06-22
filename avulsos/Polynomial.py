@@ -1,5 +1,10 @@
-def filterOnes(x):
-    return x if x != 1 | x != -1 else ""
+from math import fabs
+
+def filterFloat(num):
+    return num if int(num) != num else int(num)
+
+def filterOnesAndSignals(x):
+    return fabs(x) if (x != 1) | (x != -1) else ""
 
 def mergeLists(list1,list2):
         lenght1,lenght2 = len(list1),len(list2)
@@ -49,12 +54,39 @@ class Polynomial:
     def __sub__(self,other):
         return Polynomial(mergeLists(self.coefficients,negativeList(other.coefficients)))
     
+    def __mul__(self,other):
+        result = [0]*(self.dimensions + other.dimensions + 1)
+        for index1 in range(self.dimensions + 1):
+            if self.coefficients[index1]:
+                for index2 in range(other.dimensions + 1):
+                    if other.coefficients[index2]:
+                        result[index1 + index2] += self.coefficients[index1]*other.coefficients[index2]
+        return Polynomial(result)
+
+    def __pow__(self,exp):
+        return self*(self**(exp-1)) if exp > 1 else self
+
+    def __mod__(self,other):
+        return (self - other*Polynomial([0]*(self.dimensions - other.dimensions) + [self.coefficients[-1]/other.coefficients[-1]]))%other if self.dimensions >= other.dimensions else self
+
+    def __floordiv__(self,other):
+        return Polynomial([0]*(self.dimensions - other.dimensions) + [self.coefficients[-1]/other.coefficients[-1]]) + (self - other*Polynomial([0]*(self.dimensions - other.dimensions) + [self.coefficients[-1]/other.coefficients[-1]]))//other if self.dimensions >= other.dimensions else Polynomial()
+
+    def isRoot(self,num):
+        return False if (self%Polynomial([(-1)*num,1])).coefficients != [0] else True
+
     def __str__(self):
         if self.coefficients == [0]: return "0"
         stringfyed = ""
         if self.coefficients[0]: stringfyed += "{} ".format(self.coefficients[0])
         for index in range(1,self.dimensions + 1):
             if self.coefficients[index] != 0:
-                stringfyed += "{} {}x{} ".format("+" if self.coefficients[index] > 0 else "-",filterOnes(self.coefficients[index]),get_super(str(index)))
+                stringfyed += "{} {}x{} ".format("+" if self.coefficients[index] > 0 else "-",filterFloat(filterOnesAndSignals(self.coefficients[index])),get_super(str(index)))
         if ((self.coefficients[0] == 0) & (getLeftmostNonZero(self.coefficients) < 0)): stringfyed = "--"+stringfyed
         return stringfyed if self.coefficients[0] else stringfyed[2:]
+
+
+
+def makePolynomialFromRoots(roots = [0], multiplyer = 1):
+    if len(roots) < 2: return Polynomial(roots[0])*Polynomial([multiplyer])
+    return makePolynomialFromRoots(roots[1:]) * Polynomial([(-1)*roots[0],1]) if len(roots) > 2 else Polynomial([multiplyer])*Polynomial([(-1)*roots[0],1])*Polynomial([(-1)*roots[1],1])
