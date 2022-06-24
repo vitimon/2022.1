@@ -106,6 +106,16 @@ class Polynomial:
     def evaluate2(self,x):
         return self%Polynomial([(-1)*x,1])
 
+    def derivate(self):
+        coefficients = self.coefficients
+        if len(coefficients) > 1: coefficients.pop(0)
+        else: return 0
+        result = Polynomial(coefficients)
+        for degree in range(1, result.degree + 1):
+            result[degree] = coefficients[degree]*(degree + 1)
+
+        return result
+
 def makePolynomialFromRoots(roots = [0], multiplyer = 1):
     if len(roots) < 2: return Polynomial([roots[0],1])*Polynomial([multiplyer])
     return makePolynomialFromRoots(roots[1:]) * Polynomial([(-1)*roots[0],1]) if len(roots) > 2 else Polynomial([multiplyer])*Polynomial([(-1)*roots[0],1])*Polynomial([(-1)*roots[1],1])
