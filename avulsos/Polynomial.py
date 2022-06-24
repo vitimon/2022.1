@@ -43,7 +43,18 @@ class Polynomial:
 
     def __init__(self,coefficients=[0]):
         self.coefficients = trimRightmostZeroes(coefficients)
-        self.dimensions = len(self.coefficients) - 1
+        self.degree = len(self.coefficients) - 1
+    
+    def __getitem__(self,degree):
+        return self.coefficients[degree] if self.degree >= degree else 0
+
+    def __setitem__(self, degree, coefficient):
+        if self.degree < degree:
+            currentDegree = self.degree
+            self.degree = degree
+            self.coefficients = self.coefficients + [0]*(degree - currentDegree -1) +[1]
+        else:
+            self.coefficients[degree] = coefficient
     
     def __neg__(self):
         return Polynomial(negativeList(self.coefficients))
@@ -55,10 +66,10 @@ class Polynomial:
         return Polynomial(mergeLists(self.coefficients,negativeList(other.coefficients)))
     
     def __mul__(self,other):
-        result = [0]*(self.dimensions + other.dimensions + 1)
-        for index1 in range(self.dimensions + 1):
+        result = [0]*(self.degree + other.degree + 1)
+        for index1 in range(self.degree + 1):
             if self.coefficients[index1]:
-                for index2 in range(other.dimensions + 1):
+                for index2 in range(other.degree + 1):
                     if other.coefficients[index2]:
                         result[index1 + index2] += self.coefficients[index1]*other.coefficients[index2]
         return Polynomial(result)
@@ -67,10 +78,10 @@ class Polynomial:
         return self*(self**(exp-1)) if exp > 1 else self
 
     def __mod__(self,other):
-        return (self - other*Polynomial([0]*(self.dimensions - other.dimensions) + [self.coefficients[-1]/other.coefficients[-1]]))%other if self.dimensions >= other.dimensions else self
+        return (self - other*Polynomial([0]*(self.degree - other.degree) + [self.coefficients[-1]/other.coefficients[-1]]))%other if self.degree >= other.degree else self
 
     def __floordiv__(self,other):
-        return Polynomial([0]*(self.dimensions - other.dimensions) + [self.coefficients[-1]/other.coefficients[-1]]) + (self - other*Polynomial([0]*(self.dimensions - other.dimensions) + [self.coefficients[-1]/other.coefficients[-1]]))//other if self.dimensions >= other.dimensions else Polynomial()
+        return Polynomial([0]*(self.degree - other.degree) + [self.coefficients[-1]/other.coefficients[-1]]) + (self - other*Polynomial([0]*(self.degree - other.degree) + [self.coefficients[-1]/other.coefficients[-1]]))//other if self.degree >= other.degree else Polynomial()
 
     def isRoot(self,num):
         return False if (self%Polynomial([(-1)*num,1])).coefficients != [0] else True
@@ -79,14 +90,22 @@ class Polynomial:
         if self.coefficients == [0]: return "0"
         stringfyed = ""
         if self.coefficients[0]: stringfyed += "{} ".format(self.coefficients[0])
-        for index in range(1,self.dimensions + 1):
+        for index in range(1,self.degree + 1):
             if self.coefficients[index] != 0:
                 stringfyed += "{} {}x{} ".format("+" if self.coefficients[index] > 0 else "-",filterFloat(filterOnesAndSignals(self.coefficients[index])),get_super(str(index)))
         if ((self.coefficients[0] == 0) & (getLeftmostNonZero(self.coefficients) < 0)): stringfyed = "--"+stringfyed
         return stringfyed if self.coefficients[0] else stringfyed[2:]
 
+    def evaluate(self,x):
+        result = 0
+        coefficients = self.coefficients
+        for degree in range(self.degree + 1):
+            result += coefficients[degree]*(x**degree)
+        return(result)
 
+    def evaluate2(self,x):
+        return self%Polynomial([(-1)*x,1])
 
 def makePolynomialFromRoots(roots = [0], multiplyer = 1):
-    if len(roots) < 2: return Polynomial(roots[0])*Polynomial([multiplyer])
+    if len(roots) < 2: return Polynomial([roots[0],1])*Polynomial([multiplyer])
     return makePolynomialFromRoots(roots[1:]) * Polynomial([(-1)*roots[0],1]) if len(roots) > 2 else Polynomial([multiplyer])*Polynomial([(-1)*roots[0],1])*Polynomial([(-1)*roots[1],1])
