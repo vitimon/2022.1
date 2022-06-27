@@ -75,6 +75,7 @@ class Polynomial:
         return Polynomial(result)
 
     def __pow__(self,exp):
+        if exp == 0: return Polynomial([1])
         return self*(self**(exp-1)) if exp > 1 else self
 
     def __mod__(self,other):
@@ -113,8 +114,14 @@ class Polynomial:
         result = Polynomial(coefficients)
         for degree in range(1, result.degree + 1):
             result[degree] = coefficients[degree]*(degree + 1)
-
         return result
+    
+    def compose(self,other):
+        composition = Polynomial([0])
+        for degree in range(self.degree + 1):
+            if self.coefficients[degree]: composition += (Polynomial([self.coefficients[degree]])*(other**degree))
+        return composition
+        
 
 def makePolynomialFromRoots(roots = [0], multiplyer = 1):
     if len(roots) < 2: return Polynomial([roots[0],1])*Polynomial([multiplyer])
