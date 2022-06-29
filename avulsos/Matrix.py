@@ -1,3 +1,4 @@
+from ast import Return
 from pickle import EMPTY_DICT
 from time import sleep
 from random import randint
@@ -18,8 +19,8 @@ class Matrix:
             for column in range(self.columns):
                 self.matrix[line] += [v[line][column]]
 
-    def __init__(self,lines,columns,**initializers):
-        self = Matrix(lines,columns,[[0]*columns]*lines)
+    """def __init__(self,lines,columns,**initializers):
+        self = Matrix(lines,columns,[[0]*columns]*lines)"""
 
     def __add__(self,other):
         if type(self) != type(other):
@@ -85,7 +86,7 @@ class Matrix:
                 result[line] += [self.matrix[line][column] ^ other.matrix[line][column]]
         return Matrix(self.lines,self.columns, result)
 
-    def __repr__(self):
+    def __str__(self):
         stringfyed = ""
         for line in self.matrix:
             stringfyed += str(line) + "\n"
@@ -109,15 +110,18 @@ class Matrix:
             return pattern[(2*self.columns + self.lines -x + 2)%size ]
         if x == -1:
             return pattern[(2*self.columns + 2*self.lines - y + 3)%size]
-        return 1 if self.matrix[y][x] else 0
+        return 1 if self.matrix[y][x] > 0 else 0
 
     def __cellquence(self,x,y,externalPattern =[0]):
         currentState = self.matrix[y][x]
         nextState = 0
+        lives = False
         for delta1 in range(-1,2):
             for delta2 in range(-1,2):
                 nextState += self.__filterCell(x+delta1,y+delta2, externalPattern)
-        return 1 if nextState == 3 | (nextState - currentState) == 3 else 0
+        if (nextState == 3) | (nextState - currentState) == 3: lives = True
+        #print("cell: {},{} ---- sum: {}, current: {}  so it lives? {}".format(x,y,nextState,currentState,lives))
+        return 1 if (nextState == 3) | (nextState - currentState) == 3 else 0
 
 
 
@@ -133,12 +137,25 @@ class Matrix:
         print(self)
         simulated = self.nextState(pattern)
         while(steps > 0):
+            if simulated.matrix == simulated.lines*[simulated.columns*[0]]: return "DIED before {} steps completion".format(steps)
             print(steps)
             print(simulated)
             simulated = simulated.nextState(pattern)
             steps -= 1
             sleep(timer)
             clear()
+        return "final matrix:\n{}".format(simulated)
+
+    def insertBlock(self,x,y):
+        if (x > self.columns - 2): raise("OUT OF BOUNDS")
+        if (y > self.lines - 2): raise("OUT OF BOUNDS")
+        if (x < 0): raise("OUT OF BOUNDS")
+        if (x < 0): raise("OUT OF BOUNDS")
+        self.matrix[y][x] = 1
+        self.matrix[y + 1][x] = 1
+        self.matrix[y][x + 1] = 1
+        self.matrix[y + 1][x + 1] = 1
+        return self
 
 def makeEmptyMatrix(lines,columns):
     return Matrix(lines,columns,[[0]*columns]*lines)
